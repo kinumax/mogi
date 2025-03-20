@@ -30,3 +30,64 @@ body {
     position: absolute;
     transition: transform 0.2s ease;
 }
+
+/* パワーアップエフェクト */
+.powerup-effect {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #FFD700;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 24px;
+    z-index: 1000;
+    animation: pulse 0.5s infinite alternate;
+}
+
+.powerup-end-effect {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #FF4081;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 20px;
+    z-index: 1000;
+}
+
+.level-change-effect {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.level-change-effect h2 {
+    color: #4CAF50;
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.fade-out {
+    animation: fadeOut 1s forwards;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    100% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
