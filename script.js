@@ -272,3 +272,89 @@ function showPowerupEndEffect(name) {
     }, 1000);
 }
 
+// 衝突判定に無敵状態のチェックを追加
+if (checkCollision(player, obstacle)) {
+    // 無敵状態または浮遊状態なら衝突しない
+    if (player.isInvincible || (player.isFloating && obstacle.y < player.y)) {
+        continue;
+    }
+    
+    gameOver();
+    return;
+}
+
+// レベル定義
+const LEVELS = [
+    {
+        name: '東京',
+        distance: 0,
+        background: 'tokyo',
+        obstacleFrequency: 0.02,
+        coinFrequency: 0.05,
+        powerupFrequency: 0.01,
+        speedMultiplier: 1.0
+    },
+    {
+        name: '京都',
+        distance: 1000,
+        background: 'kyoto',
+        obstacleFrequency: 0.025,
+        coinFrequency: 0.06,
+        powerupFrequency: 0.012,
+        speedMultiplier: 1.1
+    },
+    {
+        name: '大阪',
+        distance: 2000,
+        background: 'osaka',
+        obstacleFrequency: 0.03,
+        coinFrequency: 0.07,
+        powerupFrequency: 0.015,
+        speedMultiplier: 1.2
+    },
+    {
+        name: '富士山',
+        distance: 3000,
+        background: 'fuji',
+        obstacleFrequency: 0.035,
+        coinFrequency: 0.08,
+        powerupFrequency: 0.02,
+        speedMultiplier: 1.3
+    }
+];
+
+// 現在のレベル
+let currentLevel = 0;
+let levelChanged = false;
+
+// レベルの更新
+function updateLevel() {
+    const newLevel = LEVELS.findIndex((level, index, array) => {
+        return distance >= level.distance && 
+              (index === array.length - 1 || distance < array[index + 1].distance);
+    });
+    
+    if (newLevel !== currentLevel) {
+        currentLevel = newLevel;
+        levelChanged = true;
+        showLevelChangeEffect(LEVELS[currentLevel].name);
+        return true;
+    }
+    
+    return false;
+}
+
+// レベル変更エフェクトの表示
+function showLevelChangeEffect(levelName) {
+    const effectDiv = document.createElement('div');
+    effectDiv.className = 'level-change-effect';
+    effectDiv.innerHTML = `<h2>${levelName}</h2><p>に到着しました！</p>`;
+    document.body.appendChild(effectDiv);
+    
+    setTimeout(() => {
+        effectDiv.classList.add('fade-out');
+        setTimeout(() => {
+            document.body.removeChild(effectDiv);
+        }, 1000);
+    }, 2000);
+}
