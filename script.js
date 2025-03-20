@@ -134,3 +134,141 @@ class PowerUp {
     }
 }
 
+// ゲーム状態に変数を追加
+let powerups = [];
+let activePowerups = [];
+
+// パワーアップの生成
+function generatePowerups() {
+    // 一定確率でパワーアップを生成
+    if (Math.random() < 0.01) { // 1%の確率
+        const lane = Math.floor(Math.random() * GAME_CONFIG.lanes);
+        const typeKeys = Object.keys(POWERUP_TYPES);
+        const randomType = typeKeys[Math.floor(Math.random() * typeKeys.length)];
+        const powerup = new PowerUp(randomType, lane, -50);
+        powerups.push(powerup);
+    }
+}
+
+// update関数にパワーアップの処理を追加
+function update(deltaTime) {
+    // 既存のコード...
+    
+    // パワーアップの生成
+    generatePowerups();
+    
+    // パワーアップの更新
+    for (let i = powerups.length - 1; i >= 0; i--) {
+        const powerup = powerups[i];
+        powerup.update();
+        
+        // 画面外に出たパワーアップの削除
+        if (powerup.y > canvas.height) {
+            powerups.splice(i, 1);
+            continue;
+        }
+        
+        // パワーアップ収集判定
+        if (!powerup.collected && checkCollision(player, powerup)) {
+            powerup.collected = true;
+            
+            // パワーアップ効果の適用
+            activePowerups.push({
+                type: powerup.type,
+                endTime: performance.now() + powerup.config.duration
+            });
+            
+            // 効果の開始を表示
+            showPowerupEffect(powerup.config.name);
+            
+            // パワーアップを削除
+            powerups.splice(i, 1);
+        }
+    }
+    
+    // アクティブなパワーアップの効果を適用
+    applyPowerupEffects(deltaTime);
+    
+    // 期限切れのパワーアップを削除
+    for (let i = activePowerups.length - 1; i >= 0; i--) {
+        if (performance.now() > activePowerups[i].endTime) {
+            // 効果の終了を表示
+            showPowerupEndEffect(POWERUP_TYPES[activePowerups[i].type].name);
+            activePowerups.splice(i, 1);
+        }
+    }
+}
+
+// パワーアップ効果の適用
+function applyPowerupEffects(deltaTime) {
+    for (const powerup of activePowerups) {
+        switch (powerup.type) {
+            case 'MAGNET':
+                // コインを引き寄せる効果
+                for (const coin of coinItems) {
+                    const dx = player.x - coin.x;
+                    const dy = player.y - coin.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 200) {
+                        coin.x += dx * 0.05;
+                        coin.y += dy * 0.05;
+                    }
+                }
+                break;
+                
+            case 'BALLOON':
+                // 浮遊効果（障害物を回避）
+                player.isFloating = true;
+                break;
+                
+            case 'DARUMA':
+                // 無敵効果
+                player.isInvincible = true;
+                break;
+                
+            case 'SANDALS':
+                // スピードアップ効果
+                speed = Math.min(speed * 1.5, GAME_CONFIG.maxSpeed * 1.5);
+                break;
+        }
+    }
+    
+    // パワーアップがない場合、効果をリセット
+    if (!activePowerups.some(p => p.type === 'BALLOON')) {
+        player.isFloating = false;
+    }
+    if (!activePowerups.some(p => p.type === 'DARUMA')) {
+        player.isInvincible = false;
+    }
+}
+
+// パワーアップ効果の表示
+function showPowerupEffect(name) {
+    const effectDiv = document.createElement('div');
+    effectDiv.className = 'powerup-effect';
+    effectDiv.textContent = `${name} 発動!`;
+    document.body.appendChild(effectDiv);
+    
+    setTimeout(() => {
+        effectDiv.classList.add('fade-out');
+        setTimeout(() => {
+            document.body.removeChild(effectDiv);
+        }, 1000);
+    }, 2000);
+}
+
+// パワーアップ効果終了の表示
+function showPowerupEndEffect(name) {
+    const effectDiv = document.createElement('div');
+    effectDiv.className = 'powerup-end-effect';
+    effectDiv.textContent = `${name} 終了`;
+    document.body.appendChild(effectDiv);
+    
+    setTimeout(() => {
+        effectDiv.classList.add('fade-out');
+        setTimeout(() => {
+            document.body.removeChild(effectDiv);
+        }, 1000);
+    }, 1000);
+}
+
