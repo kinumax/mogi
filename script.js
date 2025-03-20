@@ -27,6 +27,50 @@ startButton.addEventListener('click', () => {
     startButton.style.display = 'none';
     gameLoop();
 });
+// ゲームループ内でプレイヤーが更新・描画されていることを確認
+function gameLoop(currentTime) {
+    const deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
+    
+    if (gameState === 2) { // プレイ中
+        // ゲーム状態の更新
+        update(deltaTime);
+        
+        // 描画
+        render();
+        
+        // デバッグ情報
+        console.log("ゲームループ実行中");
+        
+        // 次のフレームをリクエスト
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+// render 関数内でプレイヤーが描画されていることを確認
+function render() {
+    // キャンバスのクリア
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 背景の描画
+    ctx.fillStyle = '#87CEEB';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 地面の描画
+    ctx.fillStyle = '#8BC34A';
+    ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+    
+    // レーンの描画
+    // ...
+    
+    // プレイヤーの描画
+    if (player) {
+        console.log("プレイヤー描画実行");
+        player.draw();
+    } else {
+        console.log("プレイヤーが存在しません");
+    }
+}
 
 // ゲームループ
 function gameLoop() {
