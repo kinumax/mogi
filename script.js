@@ -387,6 +387,21 @@ function generateObstacles() {
     }
 }
 
+// キャンバスのサイズ設定を確認
+function resizeCanvas() {
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+    
+    // デバッグ情報
+    console.log(`キャンバスサイズ: width=${canvas.width}, height=${canvas.height}`);
+    
+    // プレイヤーが既に存在する場合は位置を調整
+    if (player) {
+        player.x = canvas.width / 2;
+        player.y = canvas.height - 100;
+    }
+}
+
 // 背景の描画関数を修正
 function renderBackground() {
     const level = LEVELS[currentLevel];
@@ -447,6 +462,36 @@ function render() {
     
     // プレイヤーの描画
     player.draw();
+    // Player.prototype.draw または player.draw 関数を以下のように修正
+draw() {
+    // シンプルな四角形で描画（デバッグ用）
+    ctx.fillStyle = '#FF4081';
+    ctx.fillRect(this.x - this.width / 2, this.y - this.height, this.width, this.height);
+    
+    // デバッグ情報
+    console.log(`プレイヤー位置: x=${this.x}, y=${this.y}, width=${this.width}, height=${this.height}`);
+}
+// プレイヤーの初期化部分を修正
+player = new Player(
+    canvas.width / 2,  // 画面の中央
+    canvas.height - 100,  // 画面下部から100px上
+    40,  // 幅
+    60   // 高さ
+);
+
+// Player クラスのコンストラクタで位置を確認
+constructor(x, y, width, height) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.lane = 1;
+    this.isJumping = false;
+    this.isSliding = false;
+    
+    console.log(`プレイヤー作成: x=${this.x}, y=${this.y}`);
+}
+
     
     // レベル表示
     ctx.fillStyle = '#FFF';
