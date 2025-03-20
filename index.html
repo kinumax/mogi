@@ -15,7 +15,88 @@
         </div>
     </div>
     <script src="script.js">
-        // index.htmlの<script>タグ内に追加
+
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM要素の取得
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    const startScreen = document.querySelector('.game-start-screen');
+    const playScreen = document.querySelector('.game-play-screen');
+    const startButton = document.getElementById('start-button');
+    
+    // キャンバスのサイズ設定
+    canvas.width = canvas.parentElement.clientWidth || 800;
+    canvas.height = canvas.parentElement.clientHeight || 600;
+    
+    console.log(`キャンバスサイズ: ${canvas.width}x${canvas.height}`);
+    
+    // プレイヤー
+    let player = null;
+    
+    // ゲーム状態
+    let gameState = 1; // 1: スタート画面, 2: プレイ中
+    
+    // プレイヤークラス
+    class Player {
+        constructor(x, y, width, height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            console.log(`プレイヤー作成: x=${x}, y=${y}, w=${width}, h=${height}`);
+        }
+        
+        draw() {
+            console.log(`プレイヤー描画: x=${this.x}, y=${this.y}`);
+            ctx.fillStyle = '#FF4081';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height, this.width, this.height);
+        }
+    }
+    
+    // ゲーム開始
+    function startGame() {
+        gameState = 2;
+        startScreen.style.display = 'none';
+        playScreen.style.display = 'block';
+        
+        // プレイヤーの初期化
+        const playerX = canvas.width / 2;
+        const playerY = canvas.height - 100;
+        player = new Player(playerX, playerY, 40, 60);
+        
+        console.log("ゲーム開始");
+        
+        // 描画
+        render();
+    }
+    
+    // 描画
+    function render() {
+        // キャンバスのクリア
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 背景の描画
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 地面の描画
+        ctx.fillStyle = '#8BC34A';
+        ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+        
+        // プレイヤーの描画
+        if (player) {
+            player.draw();
+        } else {
+            console.log("プレイヤーが存在しません");
+        }
+    }
+    
+    // イベントリスナー
+    startButton.addEventListener('click', startGame);
+    
+    // 初期描画
+    render();
+});
 
 // 画像アセットの管理
 const IMAGES = {};
