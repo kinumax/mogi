@@ -574,4 +574,29 @@ class Player {
     }
 }
 
+// ゲーム情報表示の更新
+function updateGameInfo() {
+    scoreElement.textContent = Math.floor(score);
+    coinsElement.textContent = coins;
+    distanceElement.textContent = Math.floor(distance);
+    
+    // レベル情報の表示
+    const levelInfoElement = document.getElementById('level-info');
+    if (levelInfoElement) {
+        levelInfoElement.textContent = LEVELS[currentLevel].name;
+    }
+    
+    // アクティブなパワーアップの表示
+    const powerupInfoElement = document.getElementById('powerup-info');
+    if (powerupInfoElement) {
+        if (activePowerups.length > 0) {
+            const powerupNames = activePowerups.map(p => POWERUP_TYPES[p.type].name).join(', ');
+            powerupInfoElement.textContent = `パワーアップ: ${powerupNames}`;
+            powerupInfoElement.style.display = 'block';
+        } else {
+            powerupInfoElement.style.display = 'none';
+        }
+    }
+}
+
 
