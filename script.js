@@ -66,3 +66,71 @@ Obstacle.prototype.draw = function() {
         ctx.fillRect(this.x - this.width / 2, this.y - this.height, this.width, this.height);
     }
 };
+
+// パワーアップの種類
+const POWERUP_TYPES = {
+    MAGNET: {
+        name: '招き猫',
+        duration: 5000,
+        image: 'magnet'
+    },
+    BALLOON: {
+        name: '紙風船',
+        duration: 4000,
+        image: 'balloon'
+    },
+    DARUMA: {
+        name: 'だるま',
+        duration: 6000,
+        image: 'daruma'
+    },
+    SANDALS: {
+        name: '雲雀の草履',
+        duration: 3000,
+        image: 'sandals'
+    }
+};
+
+// パワーアップクラス
+class PowerUp {
+    constructor(type, lane, y) {
+        this.type = type;
+        this.lane = lane;
+        this.y = y;
+        this.width = 40;
+        this.height = 40;
+        this.x = (lane * GAME_CONFIG.laneWidth) + (GAME_CONFIG.laneWidth / 2);
+        this.collected = false;
+        this.config = POWERUP_TYPES[type];
+    }
+    
+    update() {
+        this.y += speed;
+        this.x = (this.lane * GAME_CONFIG.laneWidth) + (GAME_CONFIG.laneWidth / 2);
+    }
+    
+    draw() {
+        if (!this.collected) {
+            if (IMAGES.items && IMAGES.items[this.config.image.toLowerCase()]) {
+                ctx.drawImage(
+                    IMAGES.items[this.config.image.toLowerCase()],
+                    this.x - this.width / 2,
+                    this.y - this.height,
+                    this.width,
+                    this.height
+                );
+            } else {
+                // フォールバック描画
+                ctx.fillStyle = '#9C27B0';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y - this.height / 2, this.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#FFF';
+                ctx.font = '12px Arial';
+                ctx.fillText(this.config.name, this.x - this.width / 3, this.y - this.height / 4);
+            }
+        }
+    }
+}
+
