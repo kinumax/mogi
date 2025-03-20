@@ -358,3 +358,130 @@ function showLevelChangeEffect(levelName) {
         }, 1000);
     }, 2000);
 }
+
+// 障害物の生成関数を修正
+function generateObstacles() {
+    const level = LEVELS[currentLevel];
+    
+    // レベルに基づいた確率で障害物を生成
+    if (Math.random() < level.obstacleFrequency) {
+        const lane = Math.floor(Math.random() * GAME_CONFIG.lanes);
+        const obstacle = new Obstacle(lane, -50);
+        obstacles.push(obstacle);
+    }
+    
+    // レベルに基づいた確率でコインを生成
+    if (Math.random() < level.coinFrequency) {
+        const lane = Math.floor(Math.random() * GAME_CONFIG.lanes);
+        const coin = new Coin(lane, -50);
+        coinItems.push(coin);
+    }
+    
+    // レベルに基づいた確率でパワーアップを生成
+    if (Math.random() < level.powerupFrequency) {
+        const lane = Math.floor(Math.random() * GAME_CONFIG.lanes);
+        const typeKeys = Object.keys(POWERUP_TYPES);
+        const randomType = typeKeys[Math.floor(Math.random() * typeKeys.length)];
+        const powerup = new PowerUp(randomType, lane, -50);
+        powerups.push(powerup);
+    }
+}
+
+// 背景の描画関数を修正
+function renderBackground() {
+    const level = LEVELS[currentLevel];
+    
+    if (IMAGES.background && IMAGES.background[level.background]) {
+        // 背景画像を使用
+        const bgImg = IMAGES.background[level.background];
+        
+        // 背景のスクロール効果
+        const scrollY = (performance.now() * 0.1) % bgImg.height;
+        
+        ctx.drawImage(bgImg, 0, scrollY - bgImg.height, canvas.width, bgImg.height);
+        ctx.drawImage(bgImg, 0, scrollY, canvas.width, bgImg.height);
+    } else {
+        // フォールバック背景
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    // 地面の描画
+    ctx.fillStyle = '#8BC34A';
+    ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+    
+    // レーンの描画
+    ctx.strokeStyle = '#FFF';
+    ctx.lineWidth = 2;
+    for (let i = 1; i < GAME_CONFIG.lanes; i++) {
+        const x = i * GAME_CONFIG.laneWidth;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height - 50);
+        ctx.stroke();
+    }
+}
+
+// render関数を修正
+function render() {
+    // キャンバスのクリア
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 背景の描画
+    renderBackground();
+    
+    // 障害物の描画
+    for (const obstacle of obstacles) {
+        obstacle.draw();
+    }
+    
+    // コインの描画
+    for (const coin of coinItems) {
+        coin.draw();
+    }
+    
+    // パワーアップの描画
+    for (const powerup of powerups) {
+        powerup.draw();
+    }
+    
+    // プレイヤーの描画
+    player.draw();
+    
+    // レベル表示
+    ctx.fillStyle = '#FFF';
+    ctx.font = '16px Arial';
+    ctx.fillText(`レベル: ${LEVELS[currentLevel].name}`, canvas.width - 150, 30);
+}
+
+// スプライトアニメーションクラス
+class SpriteAnimation {
+    constructor(image, frameWidth, frameHeight, frameCount, frameDuration) {
+        this.image = image;
+        this.frameWidth = frameWidth;
+        this.frameHeight = frameHeight;
+        this.frameCount = frameCount;
+        this.frameDuration = frameDuration;
+        this.currentFrame = 0;
+        this.elapsedTime = 0;
+    }
+    
+    update(deltaTime) {
+        this.elapsedTime += deltaTime;
+        if (this.elapsedTime >= this.frameDuration) {
+            this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+            this.elapsedTime = 0;
+        }
+    }
+    
+    draw(ctx, x, y, width, height) {
+        const sx = this.currentFrame * this.frameWidth;
+        const sy = 0;
+        ctx.drawImage(
+            this.image,
+            sx, sy, this.frameWidth, this.frameHeight,
+            x, y, width, height
+        );
+    }
+}
+
