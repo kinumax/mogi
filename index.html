@@ -10,178 +10,25 @@
     <div id="game-container">
         <h1>もぎもぎクラフト</h1>
         <button id="start-button">ゲームスタート</button>
-        <div id="game-area">
-            <!-- フルーツの表示エリア -->
+
+        <!-- スタート画面 -->
+        <div class="game-start-screen">
+            <p>フルーツを集めてクラフトしよう！</p>
+        </div>
+
+        <!-- ゲーム画面 -->
+        <div class="game-play-screen" style="display: none;">
+            <canvas id="game-canvas"></canvas>
+        </div>
+
+        <!-- 読み込み中の表示 -->
+        <div id="loading-screen" style="display: none;">
+            <div class="progress-container">
+                <div class="progress"></div>
+            </div>
         </div>
     </div>
-    <script src="script.js">
 
-document.addEventListener('DOMContentLoaded', function() {
-    // DOM要素の取得
-    const canvas = document.getElementById('game-canvas');
-    const ctx = canvas.getContext('2d');
-    const startScreen = document.querySelector('.game-start-screen');
-    const playScreen = document.querySelector('.game-play-screen');
-    const startButton = document.getElementById('start-button');
-    
-    // キャンバスのサイズ設定
-    canvas.width = canvas.parentElement.clientWidth || 800;
-    canvas.height = canvas.parentElement.clientHeight || 600;
-    
-    console.log(`キャンバスサイズ: ${canvas.width}x${canvas.height}`);
-    
-    // プレイヤー
-    let player = null;
-    
-    // ゲーム状態
-    let gameState = 1; // 1: スタート画面, 2: プレイ中
-    
-    // プレイヤークラス
-    class Player {
-        constructor(x, y, width, height) {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-            console.log(`プレイヤー作成: x=${x}, y=${y}, w=${width}, h=${height}`);
-        }
-        
-        draw() {
-            console.log(`プレイヤー描画: x=${this.x}, y=${this.y}`);
-            ctx.fillStyle = '#FF4081';
-            ctx.fillRect(this.x - this.width / 2, this.y - this.height, this.width, this.height);
-        }
-    }
-    
-    // ゲーム開始
-    function startGame() {
-        gameState = 2;
-        startScreen.style.display = 'none';
-        playScreen.style.display = 'block';
-        
-        // プレイヤーの初期化
-        const playerX = canvas.width / 2;
-        const playerY = canvas.height - 100;
-        player = new Player(playerX, playerY, 40, 60);
-        
-        console.log("ゲーム開始");
-        
-        // 描画
-        render();
-    }
-    
-    // 描画
-    function render() {
-        // キャンバスのクリア
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // 背景の描画
-        ctx.fillStyle = '#87CEEB';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // 地面の描画
-        ctx.fillStyle = '#8BC34A';
-        ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
-        
-        // プレイヤーの描画
-        if (player) {
-            player.draw();
-        } else {
-            console.log("プレイヤーが存在しません");
-        }
-    }
-    
-    // イベントリスナー
-    startButton.addEventListener('click', startGame);
-    
-    // 初期描画
-    render();
-});
-
-// 画像アセットの管理
-const IMAGES = {};
-const ASSET_PATHS = {
-    player: {
-        ninja: 'assets/player/ninja.png',
-        samurai: 'assets/player/samurai.png'
-    },
-    background: {
-        tokyo: 'assets/background/tokyo.png',
-        fuji: 'assets/background/fuji.png'
-    },
-    obstacles: {
-        torii: 'assets/obstacles/torii.png',
-        lantern: 'assets/obstacles/lantern.png'
-    },
-    items: {
-        coin: 'assets/items/coin.png',
-        powerup: 'assets/items/powerup.png'
-    }
-};
-
-// 画像の読み込み関数
-function loadImages() {
-    const promises = [];
-    let loadedCount = 0;
-    const totalImages = countTotalImages(ASSET_PATHS);
-    
-    function countTotalImages(obj) {
-        let count = 0;
-        for (const key in obj) {
-            if (typeof obj[key] === 'object') {
-                count += countTotalImages(obj[key]);
-            } else {
-                count++;
-            }
-        }
-        return count;
-    }
-    
-    function loadImageCategory(category, paths, target) {
-        for (const key in paths) {
-            if (typeof paths[key] === 'object') {
-                target[key] = {};
-                loadImageCategory(key, paths[key], target[key]);
-            } else {
-                const img = new Image();
-                img.onload = () => {
-                    loadedCount++;
-                    // プログレスバーの更新
-                    const progress = document.querySelector('.progress');
-                    progress.style.width = `${(loadedCount / totalImages) * 100}%`;
-                };
-                img.src = paths[key];
-                target[key] = img;
-                promises.push(new Promise(resolve => { img.onload = resolve; }));
-            }
-        }
-    }
-    
-    loadImageCategory('root', ASSET_PATHS, IMAGES);
-    return Promise.all(promises);
-}
-
-// ゲーム初期化時に画像を読み込む
-function init() {
-    resizeCanvas();
-    setupEventListeners();
-    
-    // 画像の読み込み
-    loadImages().then(() => {
-        // 読み込み完了後の処理
-        loadingScreen.style.display = 'none';
-        gameState = 1; // スタート画面
-        startScreen.style.display = 'flex';
-        console.log('画像の読み込みが完了しました');
-    }).catch(error => {
-        console.error('画像の読み込みに失敗しました:', error);
-        // エラー時のフォールバック処理
-        loadingScreen.style.display = 'none';
-        gameState = 1;
-        startScreen.style.display = 'flex';
-    });
-}
-
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
