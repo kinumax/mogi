@@ -485,3 +485,93 @@ class SpriteAnimation {
     }
 }
 
+// プレイヤークラスにアニメーションを追加
+class Player {
+    constructor(x, y, width, height) {
+        // 既存のコード...
+        
+        // アニメーション状態
+        this.animations = {
+            run: null,
+            jump: null,
+            slide: null
+        };
+        
+        // アニメーションの初期化
+        if (IMAGES.player && IMAGES.player.ninja_run) {
+            this.animations.run = new SpriteAnimation(
+                IMAGES.player.ninja_run,
+                64, 64, 8, 100 // フレーム幅、高さ、フレーム数、フレーム間隔(ms)
+            );
+        }
+        
+        if (IMAGES.player && IMAGES.player.ninja_jump) {
+            this.animations.jump = new SpriteAnimation(
+                IMAGES.player.ninja_jump,
+                64, 64, 6, 100
+            );
+        }
+        
+        if (IMAGES.player && IMAGES.player.ninja_slide) {
+            this.animations.slide = new SpriteAnimation(
+                IMAGES.player.ninja_slide,
+                64, 64, 5, 100
+            );
+        }
+    }
+    
+    update(deltaTime) {
+        // 既存のコード...
+        
+        // アニメーションの更新
+        if (this.isJumping && this.animations.jump) {
+            this.animations.jump.update(deltaTime);
+        } else if (this.isSliding && this.animations.slide) {
+            this.animations.slide.update(deltaTime);
+        } else if (this.animations.run) {
+            this.animations.run.update(deltaTime);
+        }
+    }
+    
+    draw() {
+        // アニメーションの描画
+        if (this.isJumping && this.animations.jump) {
+            this.animations.jump.draw(
+                ctx,
+                this.x - this.width / 2,
+                this.y - this.height,
+                this.width,
+                this.height
+            );
+        } else if (this.isSliding && this.animations.slide) {
+            this.animations.slide.draw(
+                ctx,
+                this.x - this.width / 2,
+                this.y - this.height / 2,
+                this.width,
+                this.height / 2
+            );
+        } else if (this.animations.run) {
+            this.animations.run.draw(
+                ctx,
+                this.x - this.width / 2,
+                this.y - this.height,
+                this.width,
+                this.height
+            );
+        } else {
+            // フォールバック描画
+            ctx.fillStyle = '#FF4081';
+            ctx.fillRect(this.x - this.width / 2, this.y - this.height, this.width, this.height);
+        }
+        
+        // パワーアップ効果の表示
+        if (this.isInvincible) {
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(this.x - this.width / 2 - 5, this.y - this.height - 5, this.width + 10, this.height + 10);
+        }
+    }
+}
+
+
